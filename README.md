@@ -1,159 +1,46 @@
-# AI Chest X-ray Diagnostic Dashboard
+# Chest X-ray Diagnostic System
 
-A polished full-stack web application for AI-assisted chest X-ray analysis. Combines a Flask backend with TensorFlow model inference and a modern React+Vite frontend.
+This repository contains a compact prototype for a chest X-ray classification dashboard built with a Flask backend and a Vite/React frontend. The codebase is small, local-only, and intended for a demonstration/inference workflow.
 
-## Features
+## Current repository status
 
-- **Professional Medical Dashboard UI**: Two-column layout with real-time predictions
-- **Advanced Visualizations**:
-  - Tabbed image viewer (Original, Heatmap, Overlay)
-  - Animated confidence progress bar
-  - Visual attention heatmap with Gaussian blur + JET colormap
-- **Loading Animations**: Staged text messages during analysis
-- **Dark Theme**: Navy/cyan color scheme optimized for medical imaging
-- **Drag-and-Drop**: Intuitive image upload with preview
-- **Responsive Design**: Desktop-first, works on tablets
+This workspace does not contain the trained model file required for inference. The backend expects a file named `model_multiclass_v1.h5` at the project root, but no `.h5` model artifact is present in the repository. The code also does not include training scripts, dataset loaders, or evaluation notebooks. Because the model file is missing, the project has not been fully validated end-to-end in this workspace.
 
-## Project Structure
+## Repository map
 
-```
-minorproject/
- ├─ xray_model.h5                 # Pre-trained TensorFlow model (224x224 input)
- ├─ backend/
- │   ├─ app.py                    # Flask server (port 5000)
- │   └─ requirements.txt           # Python dependencies
- ├─ frontend/
- │   ├─ src/
- │   │   ├─ App.jsx               # Main app/state management
- │   │   ├─ main.jsx              # React entry point
- │   │   ├─ styles.css            # Professional dashboard styling
- │   │   └─ components/
- │   │       ├─ ImageUpload.jsx   # Upload & drag-drop area
- │   │       ├─ ResultPanel.jsx   # Prediction results & tabs
- │   │       └─ ProgressBar.jsx   # Confidence score bar
- │   ├─ index.html
- │   └─ package.json
- └─ README.md
-```
+- Backend: [backend/app.py](backend/app.py)
+- Backend deps: [backend/requirements.txt](backend/requirements.txt)
+- Frontend app: [frontend/index.html](frontend/index.html)
+- Frontend entry: [frontend/src/main.jsx](frontend/src/main.jsx)
+- Frontend app state: [frontend/src/App.jsx](frontend/src/App.jsx)
+- UI components: [frontend/src/components](frontend/src/components)
+- Frontend package manifest: [frontend/package.json](frontend/package.json)
+- Project docs: [ML_MODEL.md](ML_MODEL.md), [BACKEND.md](BACKEND.md), [FRONTEND.md](FRONTEND.md), [PROJECT_AUDIT.md](PROJECT_AUDIT.md)
 
-## Backend Setup
+## Verified implementation facts
 
-### Prerequisites
-- Python 3.8+
-- TensorFlow model file (`xray_model.h5`)
+- The backend is a single Flask app using `POST /predict`.
+- The model is loaded dynamically from `backend/../model_multiclass_v1.h5`.
+- The app accepts a single uploaded image, converts it to grayscale, resizes it to 224 x 224, normalizes it to `0..1`, and predicts across four classes.
+- The frontend is a single-page React application that posts a multipart form to `http://localhost:5000/predict`.
+- The backend generates a heatmap image with OpenCV, returns it as a base64-encoded PNG data URL, and the frontend renders it in tabs.
+- There is no database, no authentication, no `.env` configuration, and no external service integration in the repository.
 
-### Installation & Run
+## Major evidence gaps
 
-```bash
-# Navigate to project root
-cd C:\minorproject
+- Missing trained model file (`*.h5`).
+- Missing dataset folder or preprocessing scripts.
+- Missing training pipeline or evaluation scripts.
+- README references a different model name than the backend code (`xray_model.h5` vs `model_multiclass_v1.h5`).
+- The project includes a backup file, [frontend/src/components/ResultPanel.jsx.bak](frontend/src/components/ResultPanel.jsx.bak), which appears to be an abandoned duplicate artifact.
 
-# Create and activate virtual environment
-python -m venv venv
-venv\Scripts\Activate.ps1
+## Important note for future work
 
-# Install dependencies
-pip install -r backend/requirements.txt
+This repository is best treated as an inference prototype and documentation archive, not as a fully reproducible training project. The next major step is to recover or regenerate the missing model artifact and verify the environment before any major-project extension is attempted.
 
-# Run Flask server (localhost:5000)
-python backend/app.py
-```
+## Documentation set
 
-The backend will:
-1. Load your TensorFlow model from `../xray_model.h5`
-2. Accept image uploads via POST `/predict`
-3. Return JSON with:
-   - `prediction`: "Normal" or "Abnormal"
-   - `confidence`: float (0-1)
-   - `heatmap`: base64-encoded PNG with overlay
-
-### API Endpoint
-
-**POST** `/predict`
-
-Request:
-```
-Content-Type: multipart/form-data
-Body: { image: <file> }
-```
-
-Response:
-```json
-{
-  "prediction": "Normal",
-  "confidence": 0.92,
-  "heatmap": "data:image/png;base64,..."
-}
-```
-
-## Frontend Setup
-
-### Prerequisites
-- Node.js 16+ and npm
-
-### Installation & Run
-
-```bash
-# Navigate to frontend directory
-cd C:\minorproject\frontend
-
-# Install dependencies
-npm install
-
-# Run development server (localhost:5173)
-npm run dev
-
-# Build for production
-npm run build
-```
-
-Access the dashboard at `http://localhost:5173`
-
-## Usage
-
-1. **Start Backend**: Run `python backend/app.py` (port 5000)
-2. **Start Frontend**: Run `npm run dev` (port 5173)
-3. **Upload Image**: Drag-and-drop or click the upload area
-4. **Analyze**: Click "Analyze Image" button
-5. **View Results**:
-   - Prediction label (Normal/Abnormal)
-   - Confidence percentage with progress bar
-   - Tabbed viewer for heatmap visualizations
-
-## Architecture
-
-- **Left Column**: Image upload, drag-and-drop, preview, analyze controls
-- **Right Column**: Real-time prediction results, confidence metrics, heatmap tabs
-- **Staging Messages**: Animated text during analysis (0.8s intervals)
-- **Progress Bar**: Smoothly animates to confidence percentage (600ms)
-- **Heatmap Generation**: Backend applies Gaussian blur + JET colormap
-
-## Styling
-
-- **Colors**:
-  - Background: Deep navy (#0b1220)
-  - Cards: Dark gray (#141c2f)
-  - Accents: Cyan (#1fb6ff) / Teal (#0da9a3)
-  - Normal: Green (#22c55e)
-  - Abnormal: Red (#ff5757)
-- **Effects**: Subtle glows, smooth shadows, rounded corners
-- **Animations**: Spinner, pulse, progress fill, fade-ins
-
-## No Database
-
-- Stateless API (no persistence)
-- Results kept in frontend session memory
-- Model predictions generated on-demand
-
-## Browser Compatibility
-
-- Chrome/Edge: Full support
-- Firefox: Full support
-- Safari: Full support
-
-## Contact & Notes
-
-- Built for local demonstration
-- Requires valid TensorFlow model (H5 format)
-- Optimized for desktop displays
-- CORS enabled for development
+- [ML_MODEL.md](ML_MODEL.md) — model and training evidence audit.
+- [BACKEND.md](BACKEND.md) — Flask API and server behavior.
+- [FRONTEND.md](FRONTEND.md) — frontend structure and user flow.
+- [PROJECT_AUDIT.md](PROJECT_AUDIT.md) — repository-wide technical audit and recommendations.
