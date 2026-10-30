@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import ProgressBar from './ProgressBar'
 import HeatmapBlend from './HeatmapBlend'
 import ReferenceHeatmapTransfer from './ReferenceHeatmapTransfer'
+import ReasoningPanel from './ReasoningPanel'
 
 const CLASS_LABELS = ['COVID', 'Normal', 'Pneumonia', 'Tuberculosis']
 
@@ -85,13 +86,6 @@ export default function ResultPanel({ result, loading, error, originalSrc }) {
             <p className="confidence-note">A model score is not a measure of diagnostic certainty.</p>
           </div>
 
-          {result.summary && (
-            <div className="summary-section">
-              <h4 className="summary-title">Backend-generated summary</h4>
-              <p className="summary-text">{result.summary}</p>
-              <p className="summary-disclaimer">Automatically generated, unverified text; not a radiology report.</p>
-            </div>
-          )}
         </section>
       ) : (
         !error && !loading && (
@@ -238,6 +232,8 @@ export default function ResultPanel({ result, loading, error, originalSrc }) {
           </p>
         </section>
       )}
+
+      <ReasoningPanel result={result} />
     </div>
   )
 }
